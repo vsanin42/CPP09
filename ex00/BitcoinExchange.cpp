@@ -6,39 +6,44 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 14:50:20 by vsanin            #+#    #+#             */
-/*   Updated: 2025/07/29 18:39:19 by vsanin           ###   ########.fr       */
+/*   Updated: 2025/09/29 14:29:13 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "BitcoinExchange.hpp"
+#include <cstdlib>
 
-// Span::Span() : nums(), maxSize(0)
+BitcoinExchange::BitcoinExchange() : data() {}
+
+BitcoinExchange::BitcoinExchange(std::ifstream& db)
+{
+	std::string line;
+	db >> line;
+	while (db >> line)
+	{
+		data[line.substr(0, 10)] = std::atof(line.substr(11, line.size() - 11).c_str());
+	}
+}
+
+BitcoinExchange::BitcoinExchange(const BitcoinExchange& ref) : data(ref.data) {}
+
+BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& ref)
+{
+	if (this != &ref)
+	{
+		this->data = ref.data;
+	}
+	return *this;
+}
+
+BitcoinExchange::~BitcoinExchange() {}
+
+// std::map<std::string, float>& BitcoinExchange::getInput(void)
 // {
-// 	std::cout << "Default constructor\n";
+// 	return input;
 // }
 
-// Span::Span(unsigned int n) : nums(), maxSize(n)
-// {
-// 	std::cout << "Parametrized constructor\n";
-// }
-
-// Span::Span(const Span& ref) : nums(ref.nums), maxSize(ref.maxSize)
-// {
-// 	std::cout << "Copy constructor\n";
-// }
-
-// Span& Span::operator=(const Span& ref)
-// {
-// 	std::cout << "Copy operator\n";
-// 	if (this != &ref)
-// 	{
-// 		this->nums = ref.nums;
-// 		this->maxSize = ref.maxSize;
-// 	}
-// 	return *this;
-// }
-
-// Span::~Span()
-// {
-// 	std::cout << "Destructor\n";
-// }
+std::map<std::string, float>& BitcoinExchange::getData(void)
+{
+	return data;
+}
