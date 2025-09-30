@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   BitcoinExchange.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: vsanin <vsanin@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 14:50:20 by vsanin            #+#    #+#             */
-/*   Updated: 2025/09/29 14:29:13 by vsanin           ###   ########.fr       */
+/*   Updated: 2025/09/30 15:44:31 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,3 +47,9 @@ std::map<std::string, float>& BitcoinExchange::getData(void)
 {
 	return data;
 }
+
+void BitcoinExchange::setData(const std::map<std::string, float>& dt)
+{
+    data = dt;
+}
+ 
