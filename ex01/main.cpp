@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 18:57:53 by vsanin            #+#    #+#             */
-/*   Updated: 2025/10/03 17:38:49 by vsanin           ###   ########.fr       */
+/*   Updated: 2025/10/03 18:10:38 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 			throw std::invalid_argument("Error: empty argument");
 		if (arg.find_first_not_of("0123456789+-*/ ") != std::string::npos)
 			throw std::invalid_argument("Error: forbidden character found");
-		RPN::solveRPN(rpn, arg, len);
+		rpn.solveRPN(arg, len);
 	}
 	catch (const std::exception& e)
 	{

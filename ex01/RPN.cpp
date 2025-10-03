@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 14:50:20 by vsanin            #+#    #+#             */
-/*   Updated: 2025/10/03 17:45:53 by vsanin           ###   ########.fr       */
+/*   Updated: 2025/10/03 18:17:47 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,6 @@ RPN& RPN::operator=(const RPN& ref)
 
 RPN::~RPN() {}
 
-std::stack<double>& RPN::getStack(void) { return stack; }
-
 /*================================[ UTILS ]====================================*/
 
 static bool isOperator(char c)
@@ -41,32 +39,33 @@ static bool isOperator(char c)
 	return c == '+' || c == '-' ||  c == '*' || c == '/';
 }
 
-void RPN::printStack(std::stack<double> stack)
+void RPN::printStack(void)
 {
+	std::stack<double> copy = stack;
 	std::cout << "stack: [ ";
-	while (!stack.empty())
+	while (!copy.empty())
 	{
-		std::cout << stack.top() << " ";
-		stack.pop();
+		std::cout << copy.top() << " ";
+		copy.pop();
 	}
 	std::cout << "]\n";
 }
 
 /*================================[ RPN ]=====================================*/
 
-static void applyOperator(RPN& rpn, char c)
+void RPN::applyOperator(char c)
 {
-	if (rpn.getStack().size() < 2)
+	if (stack.size() < 2)
 		throw std::runtime_error("Error: incorrect RPN - insufficient stack size for performing leftover operations");
 	if (c == '+') std::cout << "operator: + | ";
 	if (c == '-') std::cout << "operator: - | ";
 	if (c == '*') std::cout << "operator: * | ";
 	if (c == '/') std::cout << "operator: / | ";
 
-	double rightOperand = rpn.getStack().top();
-	rpn.getStack().pop();
-	double leftOperand = rpn.getStack().top();
-	rpn.getStack().pop();
+	double rightOperand = stack.top();
+	stack.pop();
+	double leftOperand = stack.top();
+	stack.pop();
 
 	double result = 0;
 	if (c == '+') result = leftOperand + rightOperand;
@@ -74,11 +73,11 @@ static void applyOperator(RPN& rpn, char c)
 	if (c == '*') result = leftOperand * rightOperand;
 	if (c == '/') result = leftOperand / rightOperand;
 	std::cout << "result: " << result << "\n";
-	rpn.getStack().push(result);
-	RPN::printStack(rpn.getStack());
+	stack.push(result);
+	printStack();
 }
 
-void RPN::solveRPN(RPN& rpn, std::string& arg, size_t len)
+void RPN::solveRPN(std::string& arg, size_t len)
 {
 	size_t maxStackSize = 0;
 	size_t operatorCount = 0;
@@ -91,18 +90,18 @@ void RPN::solveRPN(RPN& rpn, std::string& arg, size_t len)
 		if (isOperator(arg[i]))
 		{
 			operatorCount++;
-			applyOperator(rpn, arg[i]);
+			applyOperator(arg[i]);
 		}
 		else
 		{
 			maxStackSize++;
 			double num = std::atof(arg.substr(i, 1).c_str());
-			rpn.getStack().push(num);
-			RPN::printStack(rpn.getStack());
+			stack.push(num);
+			printStack();
 		}
 	}
 	if (operatorCount != maxStackSize - 1)
 		throw std::runtime_error("Error: incorrect RPN - final value wasn't reached, extra elements left in the stack");
 	else
-		std::cout << "final result: " << rpn.getStack().top() << "\n";
+		std::cout << "final result: " << stack.top() << "\n";
 }
