@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 14:50:20 by vsanin            #+#    #+#             */
-/*   Updated: 2025/10/03 18:17:47 by vsanin           ###   ########.fr       */
+/*   Updated: 2025/10/08 13:57:41 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,8 @@ void RPN::applyOperator(char c)
 	double leftOperand = stack.top();
 	stack.pop();
 
+	if (c == '/' && rightOperand == 0)
+		throw std::runtime_error("Error: diving by zero");
 	double result = 0;
 	if (c == '+') result = leftOperand + rightOperand;
 	if (c == '-') result = leftOperand - rightOperand;
