@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 14:50:20 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/06 14:50:48 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/06 15:17:41 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,14 @@ PmergeMe::~PmergeMe() {}
 
 int PmergeMe::validateArg(const char* arg)
 {
+	if (arg[0] == '\0')
+		throw std::invalid_argument("Error: empty argument");
 	std::string orig(arg);
 	if (arg[0] == '+' && arg[1] != '\0')
 		arg++;
 	std::string str(arg);
 	if (str.find_first_not_of("0123456789") != std::string::npos)
-		throw std::invalid_argument("Error: non-integer/negative argument found (" + orig + ")");
+		throw std::invalid_argument("Error: non-digit character found in argument (" + orig + ")");
 	
 	errno = 0;
 	long l = std::strtol(str.c_str(), 0, 10);
