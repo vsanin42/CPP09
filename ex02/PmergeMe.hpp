@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 18:56:42 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/06 14:31:02 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/07 13:08:25 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,18 @@
 
 #include <vector>
 #include <deque>
+#include <cstddef>
+
+enum PrintWhenOptions { BEFORE, AFTER };
+enum PrintWhichOptions { VECTOR, DEQUE, BOTH };
 
 class PmergeMe
 {
 	private:
 		std::vector<int> vec;
 		std::deque<int> deq;
+		size_t size;
+		size_t comparisons;
 		static int validateArg(const char* argv);
 	public:
 		PmergeMe();
@@ -29,7 +35,8 @@ class PmergeMe
 		~PmergeMe();
 
 		void fillContainers(int argc, char** argv);
-		void printContainers(char option);
+		void printContainers(PrintWhenOptions whenOption, PrintWhichOptions whichOption);
+		void FJMI(size_t level);
 };
 
 #endif
