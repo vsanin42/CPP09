@@ -6,18 +6,19 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 18:56:42 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/07 13:08:25 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/07 17:24:28 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PMERGEME_HPP
 #define PMERGEME_HPP
 
+#define DEBUG 1
 #include <vector>
 #include <deque>
 #include <cstddef>
 
-enum PrintWhenOptions { BEFORE, AFTER };
+enum PrintWhenOptions { BEFORE, AFTER, NONE };
 enum PrintWhichOptions { VECTOR, DEQUE, BOTH };
 
 class PmergeMe
@@ -28,6 +29,7 @@ class PmergeMe
 		size_t size;
 		size_t comparisons;
 		static int validateArg(const char* argv);
+		std::vector<int> sortPairs(size_t compFactor, size_t pairNum);
 	public:
 		PmergeMe();
 		PmergeMe(const PmergeMe& ref);
