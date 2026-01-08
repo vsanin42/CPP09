@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 14:50:20 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/08 11:33:55 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/08 15:54:35 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int PmergeMe::validateArg(const char* arg)
 void PmergeMe::fillContainers(int argc, char** argv)
 {
 	int valid = 0;
-	std::cout << "Receiving arguments...\n";
+	if (DEBUG) std::cout << "Receiving arguments...\n";
 	for (int i = 1; i < argc; i++)
 	{
 		valid = PmergeMe::validateArg(argv[i]);
@@ -115,10 +115,10 @@ std::vector<int> PmergeMe::sortPairs(size_t compFactor, size_t pairNum)
 {
 	for (size_t i = compFactor * 2 - 1; i < size; i += compFactor * 2)
 	{
-		if (DEBUG) std::cout << "In for-loop. Pair: " << vec[i - compFactor] << " " << vec[i] << "\n";
+		if (DEBUG) std::cout << "Checking - Pair: " << vec[i - compFactor] << " " << vec[i];
 		if (vec[i - compFactor] > vec[i])
 		{
-			if (DEBUG) std::cout << "Pair of elements above needs swapping based on rightmost number comparison.\n";
+			if (DEBUG) std::cout << " - " << RED << "Needs swapping." << RESET;
 
 			size_t j = i - compFactor;
 			size_t k = i;
@@ -132,18 +132,40 @@ std::vector<int> PmergeMe::sortPairs(size_t compFactor, size_t pairNum)
 				k--;
 			}
 		}
+		if (DEBUG) std::cout << "\n";
 		comparisons++;
 	}
 	size_t isOdd = size % (compFactor * 2);
-	if (DEBUG) std::cout << "\nIs there a remainder after size & compFactor? : " << (isOdd ? "YES" : "NO") << "\n";
+	if (DEBUG) std::cout << "\nIs there a remainder after size & compFactor? : " << (isOdd ? GREEN : RED) << (isOdd ? "YES" : "NO") << "\n" << RESET;
 	if (isOdd)
 	{
 		std::vector<int> remainder(vec.begin() + (compFactor * (2 * pairNum)), vec.end());
-		if (DEBUG) printContainer(remainder, "Remainder", 1);
+		if (DEBUG)
+		{
+			std::cout << MAGENTA;
+			printContainer(remainder, "Remainder", 1);
+			std::cout << RESET;
+		}
 		return remainder;
 	}
 	
 	return std::vector<int>();
+}
+
+void PmergeMe::initMainPend(std::vector<int>& main, std::vector<int>& pend, size_t compFactor, size_t pairNum)
+{
+	if (pairNum > 1)
+	{
+		size_t i = compFactor * 2;
+		for (size_t count = 1; count <= (size / compFactor) - 2; count++)
+		{
+			for (size_t j = 0; j < compFactor; j++)
+			{
+				count % 2 == 0 ? main.push_back(vec[i]) : pend.push_back(vec[i]);
+				i++;
+			}
+		}
+	}
 }
 
 void PmergeMe::FJMI(size_t level)
@@ -158,31 +180,44 @@ void PmergeMe::FJMI(size_t level)
 	{
 		if (DEBUG)
 		{
-			std::cout << "\n-------------------------------\n";
-			std::cout << "\nPairs cannnot be formed at this level (" << level << "). Returning.\n";
-			std::cout << "\n-------------------------------\n";
+			std::cout << "\n----------------------------------------\n";
+			std::cout << BOLD YELLOW << "\nPairs cannnot be formed at this level (" << level << "). Returning.\n" << RESET;
+			std::cout << "\n----------------------------------------\n";
+
+			std::cout << BOLD << BBLUE
+			<< "\n----------------------------------------"
+			<< "\n[ STEP 2: Initiating 'main' and 'pend' ]"
+			<< "\n----------------------------------------\n" << RESET;
 		}
 		return;
 	}
 	
 	if (DEBUG)
 	{
-		std::cout << "\n-------------------------------\n\n";
-		std::cout << "Entering func call with " << level << " level\n";
-		std::cout << "At this level there will be " << pairNum << " pairs. ";
-		std::cout << "A pair has " << numsInPair << " numbers. ";
-		std::cout << "An element in a pair has " << numsInElement << " numbers.\n";
-		std::cout << "There will be " << remainingNums << " remaining numbers.\n\n";
+		if (level == 1)
+			std::cout << BOLD << BBLUE
+			<< "\n----------------------------------------"
+			<< "\n[        STEP 1: Sorting pairs         ]"
+			<< "\n----------------------------------------\n" << RESET;
+		std::cout << "\n----------------------------------------\n\n";
+		std::cout << BOLD YELLOW<< "Entering function call with LEVEL " << BCYAN << level << RESET << ".\n";
+		std::cout << "At this level there will be " << BCYAN << pairNum << RESET << " pairs. ";
+		std::cout << "A pair has " << BCYAN << numsInPair << RESET << " numbers. ";
+		std::cout << "An element in a pair has " << BCYAN << numsInElement << RESET << " numbers. ";
+		std::cout << "There will be " << BCYAN << remainingNums << RESET << " remaining numbers.\n\n";
 	}
 
-
-	
 	// 2. Basic sorting
 	size_t compFactor = numsInElement;
 	
 	if (DEBUG) printContainers(BEFORE, VECTOR);
 	std::vector<int> remainder = sortPairs(compFactor, pairNum);
-	if (DEBUG) printContainers(AFTER, VECTOR);
+	if (DEBUG)
+	{
+		std::cout << GREEN;
+		printContainers(AFTER, VECTOR);
+		std::cout << RESET;
+	}
 	
 	// 3. Recursion logic
 	FJMI(level + 1);
@@ -190,30 +225,22 @@ void PmergeMe::FJMI(size_t level)
 	// 4. After recursion returns, insertion
 	// 4.1. Initialize main and pend.
 	std::vector<int> main(vec.begin(), vec.begin() + (compFactor * 2));
-	if (DEBUG)
-	{
-		std::cout << "\nLevel: " << level << ", compFactor: " << compFactor << ", pairNum: " << pairNum << "\n";
-		printContainer(vec, "Vector", 3);
-		printContainer(main, "Main with b1 and a1", 1);
-	}
-	
 	std::vector<int> pend;
-	if (pairNum > 1)
-	{
-		size_t i = compFactor * 2;
-		for (size_t count = 1; count <= (size / numsInElement) - 2; count++)
-		{
-			for (size_t j = 0; j < compFactor; j++)
-			{
-				count % 2 == 0 ? main.push_back(vec[i]) : pend.push_back(vec[i]);
-				i++;
-			}
-		}
-	}
+
+	initMainPend(main, pend, compFactor, pairNum);
 
 	if (DEBUG)
 	{
+		std::cout << BOLD YELLOW << "\nLevel: " << BCYAN << level << RESET
+				  << BOLD << ", compFactor: " << BCYAN << compFactor << RESET
+				  << BOLD << ", pairNum: " << BCYAN << pairNum << "\n" << RESET;
+		printContainer(vec, "Vector", 3);
 		printContainer(main, "Main (b1, a1 & a's)", 1);
 		printContainer(pend, "Pend (b's from b2)", 1);
+		if (level == 1)
+			std::cout << "\n----------------------------------------\n\n";
 	}
+
+	// 4.2. Insert ???
+	
 }

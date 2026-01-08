@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 18:57:53 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/07 16:40:47 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/08 15:58:21 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,19 +17,25 @@ int main(int argc, char** argv)
 {
 	if (argc < 2)
 	{
-		std::cerr << "Error: at least one argument expected\n";
+		std::cerr << BRED << "Error: at least one argument expected\n" << RESET;
 		return 1;
 	}
 	PmergeMe p;
 	try
 	{
+		std::cout << BOLD << BBLUE
+			<< "----------------------------------------"
+			<< "\n|                                      |"
+			<< "\n[     FORD-JOHNSON MERGE INSERTION     |"
+			<< "\n|                                      |"
+			<< "\n----------------------------------------\n\n" << RESET;
 		p.fillContainers(argc, argv);
 		p.printContainers(BEFORE, BOTH);
 		p.FJMI(1);
 	}
 	catch (const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
+		std::cerr << BRED << e.what() << '\n' << RESET;
 		return 1;
 	}
 	return 0;
