@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 14:50:20 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/07 17:38:49 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/08 11:33:55 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,27 +95,18 @@ void PmergeMe::printContainers(PrintWhenOptions whenOption, PrintWhichOptions wh
 	switch (whichOption)
 	{
 		case BOTH:
-			std::cout << "Vector:\t";
-			for (std::vector<int>::iterator it = vec.begin(); it != vec.end(); ++it)
-				std::cout << " " << *it;
-			std::cout << "\nDeque:\t";
-			for (std::deque<int>::iterator it = deq.begin(); it != deq.end(); ++it)
-				std::cout << " " << *it;
+			printContainer(vec, "Vector", 2);
+			printContainer(deq, "Deque", 2);
 			break;
 		case VECTOR:
-			std::cout << "Vector:\t";
-			for (std::vector<int>::iterator it = vec.begin(); it != vec.end(); ++it)
-				std::cout << " " << *it;
+			printContainer(vec, "Vector", 2);
 			break;
 		case DEQUE:
-			std::cout << "Deque:\t";
-			for (std::deque<int>::iterator it = deq.begin(); it != deq.end(); ++it)
-				std::cout << " " << *it;
+			printContainer(deq, "Deque", 2);
 			break;
 		default:
 			std::cerr << "Invalid 'which' option.";
 	}
-	std::cout << "\n";
 }
 
 /*===============================[ Algo ]=====================================*/
@@ -144,17 +135,11 @@ std::vector<int> PmergeMe::sortPairs(size_t compFactor, size_t pairNum)
 		comparisons++;
 	}
 	size_t isOdd = size % (compFactor * 2);
-	if (DEBUG) std::cout << "\nIs there a remainder after size & compFactor? : " << isOdd << "\n";
+	if (DEBUG) std::cout << "\nIs there a remainder after size & compFactor? : " << (isOdd ? "YES" : "NO") << "\n";
 	if (isOdd)
 	{
 		std::vector<int> remainder(vec.begin() + (compFactor * (2 * pairNum)), vec.end());
-		if (DEBUG)
-		{
-			std::cout << "Remainder: ";
-			for (std::vector<int>::iterator it = remainder.begin(); it != remainder.end(); ++it)
-					std::cout << " " << *it;
-			std::cout << "\n";
-		}
+		if (DEBUG) printContainer(remainder, "Remainder", 1);
 		return remainder;
 	}
 	
@@ -169,6 +154,17 @@ void PmergeMe::FJMI(size_t level)
 	size_t pairNum = size / numsInPair;
 	size_t remainingNums = size - pairNum * numsInPair;
 	
+	if (pairNum < 1)
+	{
+		if (DEBUG)
+		{
+			std::cout << "\n-------------------------------\n";
+			std::cout << "\nPairs cannnot be formed at this level (" << level << "). Returning.\n";
+			std::cout << "\n-------------------------------\n";
+		}
+		return;
+	}
+	
 	if (DEBUG)
 	{
 		std::cout << "\n-------------------------------\n\n";
@@ -182,21 +178,42 @@ void PmergeMe::FJMI(size_t level)
 
 	
 	// 2. Basic sorting
-	size_t compFactor = std::pow(2, level - 1);
-	if (DEBUG) std::cout << "Comparing numbers " << compFactor << " apart.\n";
-	if (DEBUG) printContainers(BEFORE, VECTOR);
+	size_t compFactor = numsInElement;
 	
+	if (DEBUG) printContainers(BEFORE, VECTOR);
 	std::vector<int> remainder = sortPairs(compFactor, pairNum);
 	if (DEBUG) printContainers(AFTER, VECTOR);
-	if (DEBUG) std::cout << "Comparisons after this level: " << comparisons << "\n";
-	
-
 	
 	// 3. Recursion logic
-	if (pairNum < 2)
-	{
-		if (DEBUG) std::cout << "\nThe next level will not be able to form pairs. Returning.\n";
-		return;
-	}
 	FJMI(level + 1);
+
+	// 4. After recursion returns, insertion
+	// 4.1. Initialize main and pend.
+	std::vector<int> main(vec.begin(), vec.begin() + (compFactor * 2));
+	if (DEBUG)
+	{
+		std::cout << "\nLevel: " << level << ", compFactor: " << compFactor << ", pairNum: " << pairNum << "\n";
+		printContainer(vec, "Vector", 3);
+		printContainer(main, "Main with b1 and a1", 1);
+	}
+	
+	std::vector<int> pend;
+	if (pairNum > 1)
+	{
+		size_t i = compFactor * 2;
+		for (size_t count = 1; count <= (size / numsInElement) - 2; count++)
+		{
+			for (size_t j = 0; j < compFactor; j++)
+			{
+				count % 2 == 0 ? main.push_back(vec[i]) : pend.push_back(vec[i]);
+				i++;
+			}
+		}
+	}
+
+	if (DEBUG)
+	{
+		printContainer(main, "Main (b1, a1 & a's)", 1);
+		printContainer(pend, "Pend (b's from b2)", 1);
+	}
 }
