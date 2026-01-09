@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 14:50:20 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/08 15:54:35 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/09 11:04:55 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@ std::vector<int> PmergeMe::sortPairs(size_t compFactor, size_t pairNum)
 		comparisons++;
 	}
 	size_t isOdd = size % (compFactor * 2);
-	if (DEBUG) std::cout << "\nIs there a remainder after size & compFactor? : " << (isOdd ? GREEN : RED) << (isOdd ? "YES" : "NO") << "\n" << RESET;
+	if (DEBUG) std::cout << "\nIs there a remainder after size % compFactor? : " << (isOdd ? GREEN : RED) << (isOdd ? "YES" : "NO") << "\n" << RESET;
 	if (isOdd)
 	{
 		std::vector<int> remainder(vec.begin() + (compFactor * (2 * pairNum)), vec.end());
@@ -168,6 +168,12 @@ void PmergeMe::initMainPend(std::vector<int>& main, std::vector<int>& pend, size
 	}
 }
 
+// Offset, starts at 3 for n == 0
+size_t PmergeMe::jacobstahlGenerator(size_t n)
+{
+	return (std::pow(2, n + 3) + std::pow(-1, n)) / 3;
+}
+
 void PmergeMe::FJMI(size_t level)
 {
 	// 1. Setup info.
@@ -181,12 +187,12 @@ void PmergeMe::FJMI(size_t level)
 		if (DEBUG)
 		{
 			std::cout << "\n----------------------------------------\n";
-			std::cout << BOLD YELLOW << "\nPairs cannnot be formed at this level (" << level << "). Returning.\n" << RESET;
+			std::cout << BOLD YELLOW << "\nPairs cannnot be formed at this level (" << BCYAN << level << YELLOW << "). Returning.\n" << RESET;
 			std::cout << "\n----------------------------------------\n";
 
 			std::cout << BOLD << BBLUE
 			<< "\n----------------------------------------"
-			<< "\n[ STEP 2: Initiating 'main' and 'pend' ]"
+			<< "\n[          STEP 2: Inserting           ]"
 			<< "\n----------------------------------------\n" << RESET;
 		}
 		return;
@@ -232,15 +238,29 @@ void PmergeMe::FJMI(size_t level)
 	if (DEBUG)
 	{
 		std::cout << BOLD YELLOW << "\nLevel: " << BCYAN << level << RESET
-				  << BOLD << ", compFactor: " << BCYAN << compFactor << RESET
-				  << BOLD << ", pairNum: " << BCYAN << pairNum << "\n" << RESET;
+				  << BOLD YELLOW << ", compFactor: " << BCYAN << compFactor << RESET
+				  << BOLD YELLOW << ", pairNum: " << BCYAN << pairNum << "\n" << RESET;
 		printContainer(vec, "Vector", 3);
 		printContainer(main, "Main (b1, a1 & a's)", 1);
 		printContainer(pend, "Pend (b's from b2)", 1);
-		if (level == 1)
-			std::cout << "\n----------------------------------------\n\n";
+		std::cout << "\n";
 	}
 
-	// 4.2. Insert ???
-	
+	// 4.2. Insert
+	size_t pendElements = pend.size() / compFactor;
+	if (DEBUG) std::cout << BOLD << "Generating Jacobstahl sequence for the current pend element size ("
+						 << BCYAN << pendElements << RESET BOLD << "): \n" << RESET BLUE;
+	std::vector<size_t> jacobstahlSequence;
+	size_t n = 0;
+	while (1)
+	{
+		if (!pendElements || (n && jacobstahlSequence[n - 1] >= pendElements))
+			break;
+		jacobstahlSequence.push_back(jacobstahlGenerator(n));
+		n++;
+	}
+	printContainer(jacobstahlSequence, "J", 0);
+	std::cout << RESET;
+
+	std::cout << "\n----------------------------------------\n";
 }

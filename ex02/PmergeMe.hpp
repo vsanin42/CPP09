@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 18:56:42 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/08 15:54:06 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/09 10:20:09 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ class PmergeMe
 		size_t size;
 		size_t comparisons;
 		static int validateArg(const char* argv);
+		static size_t jacobstahlGenerator(size_t level);
 		std::vector<int> sortPairs(size_t compFactor, size_t pairNum);
 	public:
 		PmergeMe();
@@ -68,7 +69,8 @@ class PmergeMe
 template <typename T>
 void printContainer(const T& cont, const std::string& name, int tabCount)
 {
-	std::cout << name << ":";
+	if (name.size())
+		std::cout << name << ":";
 	for (int i = 0; i < tabCount; i++)
 		std::cout << "\t";
 	for (typename T::const_iterator it = cont.begin(); it != cont.end(); ++it)
