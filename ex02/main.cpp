@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 18:57:53 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/08 15:58:21 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/09 17:58:39 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ int main(int argc, char** argv)
 		p.fillContainers(argc, argv);
 		p.printContainers(BEFORE, BOTH);
 		p.FJMI(1);
+		p.printContainers(AFTER, BOTH);
 	}
 	catch (const std::exception& e)
 	{

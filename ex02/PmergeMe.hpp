@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 18:56:42 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/09 10:20:09 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/09 15:26:52 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ class PmergeMe
 		size_t comparisons;
 		static int validateArg(const char* argv);
 		static size_t jacobstahlGenerator(size_t level);
+		static void jacobstahlCreate(std::vector<size_t>& jacobstahlSequence, size_t pendElementsCount);
 		std::vector<int> sortPairs(size_t compFactor, size_t pairNum);
 	public:
 		PmergeMe();
@@ -62,12 +63,17 @@ class PmergeMe
 
 		void fillContainers(int argc, char** argv);
 		void initMainPend(std::vector<int>& main, std::vector<int>& pend, size_t compFactor, size_t pairNum);
+		void structureMain(std::vector< std::pair<std::vector<int>, size_t> >& mainElements, std::vector<int> main, size_t compFactor);
+		void structurePend(std::vector< std::pair<std::vector<int>, size_t> >& pendElements, std::vector<int> pend, size_t compFactor);
 		void printContainers(PrintWhenOptions whenOption, PrintWhichOptions whichOption);
+		void printMain(std::vector< std::pair<std::vector<int>, size_t> >& mainElements);
+		void printPend(std::vector< std::pair<std::vector<int>, size_t> >& pendElements);
+		size_t binarySearch(std::vector< std::pair<std::vector<int>, size_t> >& mainElements, std::vector< std::pair<std::vector<int>, size_t> >& pendElements, size_t startIndex);
 		void FJMI(size_t level);
 };
 
 template <typename T>
-void printContainer(const T& cont, const std::string& name, int tabCount)
+void printContainer(const T& cont, const std::string& name, int tabCount, bool printNewline)
 {
 	if (name.size())
 		std::cout << name << ":";
@@ -75,7 +81,8 @@ void printContainer(const T& cont, const std::string& name, int tabCount)
 		std::cout << "\t";
 	for (typename T::const_iterator it = cont.begin(); it != cont.end(); ++it)
 		std::cout << " " << *it;
-	std::cout << "\n";
+	if (printNewline)
+		std::cout << "\n";
 }
 
 #endif
