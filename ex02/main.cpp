@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 18:57:53 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/09 17:58:39 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/19 16:27:10 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,15 +23,11 @@ int main(int argc, char** argv)
 	PmergeMe p;
 	try
 	{
-		std::cout << BOLD << BBLUE
-			<< "----------------------------------------"
-			<< "\n|                                      |"
-			<< "\n[     FORD-JOHNSON MERGE INSERTION     |"
-			<< "\n|                                      |"
-			<< "\n----------------------------------------\n\n" << RESET;
 		p.fillContainers(argc, argv);
 		p.printContainers(BEFORE, BOTH);
-		p.FJMI(1);
+		p.FJMIEntry(p.getVector());
+		p.setComparisons(0);
+		p.FJMIEntry(p.getDeque());
 		p.printContainers(AFTER, BOTH);
 	}
 	catch (const std::exception& e)
