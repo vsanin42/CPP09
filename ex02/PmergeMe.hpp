@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 18:56:42 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/19 16:43:53 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/19 18:51:35 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #define  MAGENTA  "\033[35m"
 #define  CYAN     "\033[36m"
 #define  WHITE    "\033[37m"
+#define  ORANGE   "\033[38;5;208m"
 
 #define  BRED     "\033[91m"
 #define  BGREEN   "\033[92m"
@@ -233,59 +234,66 @@ size_t PmergeMe::binarySearch(U& mainElements, U& pendElements, size_t startInde
 	size_t upperBound = mainElements.size() - 1; // bad output below
 	if (DEBUG)
 	{
+		std::cout << BOLD BMAGENTA << "Binary search" << RESET << "\n";
+		std::cout << MAGENTA << "Defining search range" << RESET << "\n";
 		printContainer(pendElements[startIndex].first, "Trying to insert element", 0, 1);
-		std::cout << "Defining search range. Currently searching main up to index " << upperBound << " (literal) or " << mainElements[upperBound].second << " (displayed)\n";
+		std::cout << "Currently searching main up to max element: " << BGREEN << "[" << mainElements[upperBound].second << "]\n" << RESET;
 	}
 	for (size_t i = 0; i < mainElements.size(); i++)
 	{
 		if (mainElements[i].second == pendElements[startIndex].second)
 		{
-			if (DEBUG)
-			{
-				std::cout << "Found a corresponding index in main\n";
-				std::cout << "The pend element being inserted will be smaller that that, search field will shrink\n";
-			}
+			if (DEBUG) std::cout << "Found a corresponding index in main. The pend element being inserted will be smaller that that, search field will shrink\n";
 			upperBound = i - 1;
 		}
 	}
 	
 	if (DEBUG)
 	{
-		std::cout << "After index lookup: Currently searching main up to index " << upperBound << " (literal) or " << mainElements[upperBound].second << " (displayed)\n";
-		std::cout << "Binary search for a place to insert\n";
+		std::cout << "After adjustment - Searching up to element: " << BGREEN << "[" << mainElements[upperBound].second << "]\n" << RESET;
+		std::cout << MAGENTA << "\nFinding an index for insertion\n" << RESET;
 	}
 	size_t lowerBound = 0;
 	size_t mid = 0;
 	
+	// todo optimization
 	while (lowerBound != upperBound)
 	{
 		mid = lowerBound + ((upperBound - lowerBound) / 2);
 
 		if (DEBUG)
 		{
-			std::cout << "In range: " << lowerBound << " - " << upperBound << "\n";
-			std::cout << "Step 1: finding mid index: " << mid << "\n";
-			std::cout << "Step 2: comparing: " << pendElements[startIndex].first[rightmost] << " ? " << mainElements[mid].first[rightmost] << "\n";
+			std::cout << "In range: " << ORANGE << lowerBound << RESET " - " << ORANGE << upperBound << RESET << " \t|\t";
+			std::cout << "Step 1: finding mid index: " ORANGE << mid << RESET << "\t|\t";
+			std::cout << "Step 2: comparing numbers: " << BCYAN << pendElements[startIndex].first[rightmost] << RESET BOLD << " ? " << RESET BCYAN << mainElements[mid].first[rightmost] << RESET << "\n";
 		}
-		// duplicates here?
-		if (pendElements[startIndex].first[rightmost] > mainElements[mid].first[rightmost])
+		if (pendElements[startIndex].first[rightmost] >= mainElements[mid].first[rightmost])
 		{
-			if (DEBUG) std::cout << "Updated lowerBound up\n";
+			if (DEBUG) std::cout << "Updated " << BOLD << "lowerBound" << RESET << " - shifted up\n";
 			lowerBound = mid + 1;
-			comparisons++;
 		}
-		else if (pendElements[startIndex].first[rightmost] < mainElements[mid].first[rightmost])
+		else
 		{
-			if (DEBUG) std::cout << "Updated upperBound down\n";
+			if (DEBUG) std::cout << "Updated " << BOLD << "upperBound" << RESET << " - shifted down\n";
 			upperBound = mid ? mid - 1 : 0;
-			comparisons++;
 		}
+		comparisons++;
 	}
-	if (DEBUG) std::cout << "Step 3: lower == upper - potential index for insertion found: " << lowerBound << "\n";
-	if (pendElements[startIndex].first[rightmost] > mainElements[lowerBound].first[rightmost]) // we either place it below or above current found index
+	if (DEBUG)
 	{
-		if (DEBUG) std::cout << "Updated lowerBound - special case\n";
+		std::cout << BOLD << "lowerBound == upperBound" << RESET << " - potential index for insertion found: " << ORANGE << lowerBound << RESET << "\n";
+		std::cout << "Comparing number to insert (" << BCYAN << pendElements[startIndex].first[rightmost] << RESET
+				  << ") to current number at the index (" << BCYAN << mainElements[lowerBound].first[rightmost] << RESET << ")\n";
+	}
+	if (pendElements[startIndex].first[rightmost] > mainElements[lowerBound].first[rightmost])
+	{
+		if (DEBUG) std::cout << "Updating index (++) / swapping elements\n";
 		lowerBound++;
+		comparisons++;
+	}
+	else
+	{
+		if (DEBUG) std::cout << "Index unchanged after final comparison\n";
 		comparisons++;
 	}
 	return lowerBound;
@@ -389,14 +397,14 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 	if (!pendElementsCount)
 	{
 		std::cout << YELLOW << "\nPend empty, nothing to insert.\n" << RESET;
-		std::cout << "\n----------------------------------------\n";
+		std::cout << "\n----------------------------------------\n\n";
 		return;
 	}
 	
 	U pendElements;
 	structurePend(pendElements, pend, compFactor);
 
-
+	if (DEBUG) std::cout << "\n---\n";
 
 	int n = 0; // increase when we want to shift to the next jacobstahl number in the sequence
 	size_t insertionsCount = 0;
@@ -418,8 +426,10 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 		else
 			J = jacobstahlSequence[n];
 
-		if (DEBUG) std::cout << "Current selected Jacobstahl number: " << J << "\n";
-		
+		if (DEBUG)
+		{
+			std::cout << BBLUE << "\nCurrent selected Jacobstahl number: " << BOLD << J << RESET << "\n";
+		}
 		if (J > 0)
 		{
 			for (size_t i = 0; i < pendElements.size(); i++)
@@ -427,14 +437,15 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 				if (pendElements[i].second == J)
 				{
 					startIndex = i;
-					if (DEBUG) std::cout << "Starting inserting with pend element " << pendElements[i].second << ", index matches J\n";
-					if (DEBUG) printContainer(pendElements[i].first, "Element", 0, 1);
+					if (DEBUG) std::cout << "Starting inserting with pend element " << BGREEN << "[" << pendElements[i].second << "]" << RESET
+										 << ", index matches " << BBLUE "J\n" << RESET;
+					// if (DEBUG) printContainer(pendElements[i].first, "Element", 0, 1);
 				}
 			}
 		}
 		else
 		{
-			if (DEBUG) std::cout << "Ran out of Jacobstahl numbers. Inserting the remaining pend elements in reverse order\n";
+			if (DEBUG) std::cout << YELLOW "Ran out of Jacobstahl numbers. Inserting the remaining pend elements in reverse order\n" << RESET;
 			startIndex = pendElements.size() - 1; // correct?
 		}
 		
@@ -445,9 +456,10 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 		if (DEBUG) printPend(pendElements);
 		startIndex--;
 		insertionsCount++;
+		std::cout << "\n---\n";
 	}
 
-	if (DEBUG) printContainer(cont, "Original container before insertion at this level", 1, 1);
+	if (DEBUG) printContainer(cont, "\nOriginal container before insertion at this level", 1, 1);
 	for (size_t el = 0; el < mainElements.size(); el++)
 	{
 		for (size_t i = 0; i < compFactor; i++)
