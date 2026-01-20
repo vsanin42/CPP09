@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 14:50:20 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/19 16:27:28 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/20 14:01:28 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,8 @@ std::vector<int>& PmergeMe::getVector(void) { return vec; }
 std::deque<int>& PmergeMe::getDeque(void) { return deq; }
 
 void PmergeMe::setComparisons(size_t count) { comparisons = count; }
+
+size_t PmergeMe::getComparisons(void) { return comparisons; }
 
 /*============================================================================*/
 /*||                             JACOBSTAHL                                 ||*/

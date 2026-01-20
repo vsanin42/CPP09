@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 18:57:53 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/19 16:27:10 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/20 14:28:34 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,18 @@ int main(int argc, char** argv)
 		p.fillContainers(argc, argv);
 		p.printContainers(BEFORE, BOTH);
 		p.FJMIEntry(p.getVector());
+		if (DEBUG)
+		{
+			std::cout << "\nComparisons: " << p.getComparisons() << "\n";
+			std::cout << "\n----------------------------------------\n\n";
+		}
 		p.setComparisons(0);
 		p.FJMIEntry(p.getDeque());
+		if (DEBUG)
+		{
+			std::cout << "\nComparisons: " << p.getComparisons() << "\n";
+			std::cout << "\n----------------------------------------\n\n";
+		}
 		p.printContainers(AFTER, BOTH);
 	}
 	catch (const std::exception& e)

@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 18:56:42 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/19 18:51:35 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/20 14:39:29 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,8 @@ class PmergeMe
 		std::vector<int>& getVector(void);
 		std::deque<int>& getDeque(void);
 		void setComparisons(size_t count);
+		size_t getComparisons(void);
+		
 		template <typename T>
 		void initMainPend(T& cont, T& main, T& pend, size_t compFactor, size_t pairNum);
 
@@ -323,7 +325,7 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 			std::cout << BOLD << BBLUE
 			<< "\n----------------------------------------"
 			<< "\n|          STEP 2: Inserting           |"
-			<< "\n----------------------------------------\n\n" << RESET;
+			<< "\n----------------------------------------\n" << RESET;
 		}
 		return;
 	}
@@ -343,8 +345,6 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 		std::cout << "There will be " << BCYAN << remainingNums << RESET << " remaining numbers.\n\n";
 	}
 
-
-	
 	// 2. Basic sorting.
 	size_t compFactor = numsInElement;
 	
@@ -357,13 +357,9 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 		std::cout << RESET;
 	}
 	
-
-	
 	// 3. Recursion logic - all sorting in the previous step must happen first, then insertion on unwind.
 	FJMICore(cont, mainElements, level + 1);
 
-
-	
 	// 4. After recursion returns, insertion.
 	// 4.1. Initialize raw main and pend.
 	T main(cont.begin(), cont.begin() + (compFactor * 2));
@@ -373,7 +369,7 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 
 	if (DEBUG)
 	{
-		std::cout << BOLD YELLOW << "Level: " << BCYAN << level << RESET
+		std::cout << BOLD YELLOW << "\nLevel: " << BCYAN << level << RESET
 				  << BOLD YELLOW << ", compFactor: " << BCYAN << compFactor << RESET
 				  << BOLD YELLOW << ", pairNum: " << BCYAN << pairNum << "\n" << RESET;
 		printContainer(cont, "Container", 2, 1);
@@ -382,31 +378,40 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 		std::cout << "\n";
 	}
 
-
-	
 	// 4.2. Create a Jacobstahl sequence for the current level and pend size.
 	size_t pendElementsCount = pend.size() / compFactor;
 	std::vector<size_t> jacobstahlSequence;
 	jacobstahlCreate(jacobstahlSequence, pendElementsCount);
 
-
-	
 	// 4.3. Structure raw main and pend to contain predefined indexes to track during the insertion.
 	structureMain(mainElements, main, compFactor);
 	
-	if (!pendElementsCount)
+	if (!pendElementsCount && cont.size() != 3)
 	{
 		std::cout << YELLOW << "\nPend empty, nothing to insert.\n" << RESET;
-		std::cout << "\n----------------------------------------\n\n";
+		std::cout << "\n----------------------------------------\n";
 		return;
 	}
 	
 	U pendElements;
-	structurePend(pendElements, pend, compFactor);
+
+	if (cont.size() == 3 && remainder.size() == 1)
+	{
+		if (DEBUG)
+		{
+			std::cout << "\n3 number special case - couldn't form pend. Must insert remainder from sorting pairs: " << MAGENTA;
+			printContainer(remainder, "", 0, 1);
+			std::cout << RESET << "Creating pend with 1 remainder element\n";
+		}
+		pendElements.push_back(std::make_pair(T(1, remainder[0]), 2));
+		if (DEBUG) printPend(pendElements);
+	}
+	else
+		structurePend(pendElements, pend, compFactor);
 
 	if (DEBUG) std::cout << "\n---\n";
 
-	int n = 0; // increase when we want to shift to the next jacobstahl number in the sequence
+	int n = 0;
 	size_t insertionsCount = 0;
 	size_t startIndex = 0;
 	while (pendElements.size())
@@ -426,10 +431,7 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 		else
 			J = jacobstahlSequence[n];
 
-		if (DEBUG)
-		{
-			std::cout << BBLUE << "\nCurrent selected Jacobstahl number: " << BOLD << J << RESET << "\n";
-		}
+		if (DEBUG) std::cout << BBLUE << "\nCurrent selected Jacobstahl number: " << BOLD << J << RESET << "\n";
 		if (J > 0)
 		{
 			for (size_t i = 0; i < pendElements.size(); i++)
@@ -437,26 +439,24 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 				if (pendElements[i].second == J)
 				{
 					startIndex = i;
-					if (DEBUG) std::cout << "Starting inserting with pend element " << BGREEN << "[" << pendElements[i].second << "]" << RESET
-										 << ", index matches " << BBLUE "J\n" << RESET;
-					// if (DEBUG) printContainer(pendElements[i].first, "Element", 0, 1);
+					if (DEBUG) std::cout << "Starting inserting with pend element " << BGREEN << "[" << pendElements[i].second << "]" << RESET << ", index matches " << BBLUE "J\n" << RESET;
 				}
 			}
 		}
 		else
 		{
 			if (DEBUG) std::cout << YELLOW "Ran out of Jacobstahl numbers. Inserting the remaining pend elements in reverse order\n" << RESET;
-			startIndex = pendElements.size() - 1; // correct?
+			startIndex = pendElements.size() - 1;
 		}
-		
+		if (DEBUG) std::cout << "Start index: " << startIndex << "\n";
 		size_t insertionIndex = binarySearch(mainElements, pendElements, startIndex);
 		mainElements.insert(mainElements.begin() + insertionIndex, pendElements[startIndex]);
 		pendElements.erase(pendElements.begin() + startIndex);
 		if (DEBUG) printMain(mainElements);
 		if (DEBUG) printPend(pendElements);
-		startIndex--;
+		startIndex > 0 ? startIndex-- : startIndex = 0;
 		insertionsCount++;
-		std::cout << "\n---\n";
+		if (DEBUG) std::cout << "\n---\n";
 	}
 
 	if (DEBUG) printContainer(cont, "\nOriginal container before insertion at this level", 1, 1);
@@ -468,9 +468,6 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 		}
 	}
 	if (DEBUG) printContainer(cont, "Original container after insertion at this level", 1, 1);
-
-	std::cout << "\nComparisons: " << comparisons << "\n";
-	std::cout << "\n----------------------------------------\n\n";
 }
 
 #endif
