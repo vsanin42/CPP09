@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 18:57:53 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/20 14:28:34 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/20 19:45:17 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +31,14 @@ int main(int argc, char** argv)
 			std::cout << "\nComparisons: " << p.getComparisons() << "\n";
 			std::cout << "\n----------------------------------------\n\n";
 		}
-		p.setComparisons(0);
-		p.FJMIEntry(p.getDeque());
-		if (DEBUG)
-		{
-			std::cout << "\nComparisons: " << p.getComparisons() << "\n";
-			std::cout << "\n----------------------------------------\n\n";
-		}
-		p.printContainers(AFTER, BOTH);
+		// p.setComparisons(0);
+		// p.FJMIEntry(p.getDeque());
+		// if (DEBUG)
+		// {
+			// std::cout << "\nComparisons: " << p.getComparisons() << "\n";
+			// std::cout << "\n----------------------------------------\n\n";
+		// }
+		p.printContainers(AFTER, VECTOR);
 	}
 	catch (const std::exception& e)
 	{

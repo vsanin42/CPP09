@@ -6,14 +6,14 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 18:56:42 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/20 14:39:29 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/20 19:43:05 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PMERGEME_HPP
-#define PMERGEME_HPP
+#ifndef  PMERGEME_HPP
+#define  PMERGEME_HPP
 
-#define DEBUG 1
+#define  DEBUG 1
 
 #define  RESET   "\033[0m"
 
@@ -246,7 +246,8 @@ size_t PmergeMe::binarySearch(U& mainElements, U& pendElements, size_t startInde
 		if (mainElements[i].second == pendElements[startIndex].second)
 		{
 			if (DEBUG) std::cout << "Found a corresponding index in main. The pend element being inserted will be smaller that that, search field will shrink\n";
-			upperBound = i - 1;
+			i == 0 ? upperBound = 0 : upperBound = i - 1;
+			break;
 		}
 	}
 	
@@ -279,6 +280,10 @@ size_t PmergeMe::binarySearch(U& mainElements, U& pendElements, size_t startInde
 			if (DEBUG) std::cout << "Updated " << BOLD << "upperBound" << RESET << " - shifted down\n";
 			upperBound = mid ? mid - 1 : 0;
 		}
+		if (upperBound < lowerBound)
+			upperBound = lowerBound;
+		if (lowerBound > upperBound)
+			lowerBound = upperBound;
 		comparisons++;
 	}
 	if (DEBUG)
@@ -388,8 +393,11 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 	
 	if (!pendElementsCount && cont.size() != 3)
 	{
-		std::cout << YELLOW << "\nPend empty, nothing to insert.\n" << RESET;
-		std::cout << "\n----------------------------------------\n";
+		if (DEBUG)
+		{
+			std::cout << YELLOW << "\nPend empty, nothing to insert.\n" << RESET;
+			std::cout << "\n----------------------------------------\n";
+		}
 		return;
 	}
 	
