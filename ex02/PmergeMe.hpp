@@ -6,35 +6,26 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 18:56:42 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/21 16:11:16 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/22 18:05:36 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef  PMERGEME_HPP
 #define  PMERGEME_HPP
 
-#define  DEBUG 1
+#define  DEBUG 0
 
 #define  RESET   "\033[0m"
-
 #define  RED      "\033[31m"
 #define  GREEN    "\033[32m"
 #define  YELLOW   "\033[33m"
-#define  BLUE     "\033[34m"
 #define  MAGENTA  "\033[35m"
-#define  CYAN     "\033[36m"
-#define  WHITE    "\033[37m"
 #define  ORANGE   "\033[38;5;208m"
-
-#define  BRED     "\033[91m"
 #define  BGREEN   "\033[92m"
-#define  BYELLOW  "\033[93m"
 #define  BBLUE    "\033[94m"
 #define  BMAGENTA "\033[95m"
 #define  BCYAN    "\033[96m"
-
 #define  BOLD     "\033[1m"
-#define  DIM      "\033[2m"
 
 #include <vector>
 #include <deque>
@@ -42,9 +33,6 @@
 #include <string>
 #include <iostream>
 #include <cmath>
-
-enum PrintWhenOptions { BEFORE, AFTER, NONE };
-enum PrintWhichOptions { VECTOR, DEQUE, BOTH };
 
 class PmergeMe
 {
@@ -59,6 +47,23 @@ class PmergeMe
 		
 		template <typename T>
 		T sortPairs(T& cont, size_t compFactor, size_t pairNum);
+		template <typename T>
+		void initMainPend(T& cont, T& main, T& pend, size_t compFactor, size_t pairNum, size_t level);
+		template <typename T, typename U>
+		void structureMain(U& mainElements, T& main, size_t compFactor);
+		template <typename T, typename U>
+		void structurePend(U& pendElements, T& pend, size_t compFactor, T& remainder, T& cont);
+		template <typename U>
+		size_t findStartIndex(size_t J, U& pendElements, size_t startIndex, size_t insertionsCount);
+		template <typename U>
+		size_t binarySearch(U& mainElements, U& pendElements, size_t startIndex);
+		template <typename T, typename U>
+		void FJMICore(T& cont, U& mainElements, size_t level);
+		
+		template <typename U>
+		void printMain(U& mainElements);
+		template <typename U>
+		void printPend(U& pendElements);
 	public:
 		PmergeMe();
 		PmergeMe(const PmergeMe& ref);
@@ -68,34 +73,19 @@ class PmergeMe
 		void fillContainers(int argc, char** argv);
 		std::vector<int>& getVector(void);
 		std::deque<int>& getDeque(void);
-		void setComparisons(size_t count);
 		size_t getComparisons(void);
-		
-		template <typename T>
-		void initMainPend(T& cont, T& main, T& pend, size_t compFactor, size_t pairNum, size_t level);
-
-		template <typename T, typename U>
-		void structureMain(U& mainElements, T& main, size_t compFactor);
-		template <typename T, typename U>
-		void structurePend(U& pendElements, T& pend, size_t compFactor, T& remainder, T& cont);
-		
-		void printContainers(PrintWhenOptions whenOption, PrintWhichOptions whichOption);
-		
-		template <typename U>
-		void printMain(U& mainElements);
-		template <typename U>
-		void printPend(U& pendElements);
-		
-		template <typename U>
-		size_t binarySearch(U& mainElements, U& pendElements, size_t startIndex);
-
-		template <typename U>
-		size_t findStartIndex(size_t J, U& pendElements, size_t startIndex, size_t insertionsCount);
+		size_t getSize(void);
 		
 		void FJMIEntry(std::vector<int>& cont);
 		void FJMIEntry(std::deque<int>& cont);
-		template <typename T, typename U>
-		void FJMICore(T& cont, U& mainElements, size_t level);
+
+		template <typename T>
+		bool isSorted(const T& cont) const;
+
+		template <typename T>
+		static void printContainer(const T& cont, const std::string& name, int tabCount, bool printNewline);
+		template <typename T>		
+		static void printContainerShort(const T& cont, const std::string& name, int tabCount, bool printNewline);
 };
 
 
@@ -104,7 +94,7 @@ class PmergeMe
 /*============================================================================*/
 
 template <typename T>
-void printContainer(const T& cont, const std::string& name, int tabCount, bool printNewline)
+void PmergeMe::printContainer(const T& cont, const std::string& name, int tabCount, bool printNewline)
 {
 	if (name.size())
 		std::cout << name << ":";
@@ -114,6 +104,37 @@ void printContainer(const T& cont, const std::string& name, int tabCount, bool p
 		std::cout << " " << *it;
 	if (printNewline)
 		std::cout << "\n";
+}
+
+template <typename T>
+void PmergeMe::printContainerShort(const T& cont, const std::string& name, int tabCount, bool printNewline)
+{
+	if (name.size())
+		std::cout << name << ":";
+	for (int i = 0; i < tabCount; i++)
+		std::cout << "\t";
+	if (cont.size() > 25)
+	{
+		for (typename T::const_iterator it = cont.begin(); it != cont.begin() + 4; ++it)
+			std::cout << " " << *it;
+		std::cout << " [...]";
+	}
+	else
+	{
+		for (typename T::const_iterator it = cont.begin(); it != cont.end(); ++it)
+			std::cout << " " << *it;
+	}
+	if (printNewline)
+		std::cout << "\n";
+}
+
+template <typename T>
+bool PmergeMe::isSorted(const T& cont) const
+{
+	if (cont.size() <= 1) return true;
+	for (typename T::const_iterator it = cont.begin(); it + 1 != cont.end(); ++it)
+		if (*it > *(it + 1)) return false;
+	return true;
 }
 
 /*============================================================================*/
@@ -175,6 +196,11 @@ void PmergeMe::initMainPend(T& cont, T& main, T& pend, size_t compFactor, size_t
 				i++;
 			}
 		}
+	}
+	if (pairNum == 1 && ((size - compFactor * 2) / compFactor == 1))
+	{
+		for (size_t i = compFactor * 2; i < (compFactor * 2) + compFactor; i++)
+			pend.push_back(cont[i]);
 	}
 	if (DEBUG)
 	{
@@ -394,11 +420,7 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 	
 	if (!pendElementsCount && cont.size() != 3)
 	{
-		if (DEBUG)
-		{
-			std::cout << YELLOW << "\nPend empty, nothing to insert.\n" << RESET;
-			std::cout << "\n----------------------------------------\n";
-		}
+		if (DEBUG) std::cout << YELLOW << "\nPend empty, nothing to insert.\n" << RESET << "\n----------------------------------------\n";
 		return;
 	}
 	
@@ -449,6 +471,7 @@ void PmergeMe::FJMICore(T& cont, U& mainElements, size_t level)
 		}
 	}
 	if (DEBUG) printContainer(cont, "Original container after insertion at this level", 1, 1);
+	if (DEBUG) std::cout << "\n";
 }
 
 #endif

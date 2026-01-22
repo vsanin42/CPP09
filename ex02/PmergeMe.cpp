@@ -6,7 +6,7 @@
 /*   By: vsanin <vsanin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 14:50:20 by vsanin            #+#    #+#             */
-/*   Updated: 2026/01/20 14:01:28 by vsanin           ###   ########.fr       */
+/*   Updated: 2026/01/22 17:52:16 by vsanin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,47 +81,13 @@ void PmergeMe::fillContainers(int argc, char** argv)
 /*||                                UTILS                                   ||*/
 /*============================================================================*/
 
-void PmergeMe::printContainers(PrintWhenOptions whenOption, PrintWhichOptions whichOption)
-{
-	switch (whenOption)
-	{
-		case BEFORE:
-			std::cout << "Before sorting:\n";
-			break;
-		case AFTER:
-			std::cout << "After sorting:\n";
-			break;
-		case NONE:
-			break;
-		default:
-			std::cerr << "Invalid 'when' option.\n";
-			return;
-	}
-	
-	switch (whichOption)
-	{
-		case BOTH:
-			printContainer(vec, "Vector", 2, 1);
-			printContainer(deq, "Deque", 2, 1);
-			break;
-		case VECTOR:
-			printContainer(vec, "Vector", 2, 1);
-			break;
-		case DEQUE:
-			printContainer(deq, "Deque", 2, 1);
-			break;
-		default:
-			std::cerr << "Invalid 'which' option.";
-	}
-}
-
 std::vector<int>& PmergeMe::getVector(void) { return vec; }
 
 std::deque<int>& PmergeMe::getDeque(void) { return deq; }
 
-void PmergeMe::setComparisons(size_t count) { comparisons = count; }
-
 size_t PmergeMe::getComparisons(void) { return comparisons; }
+
+size_t PmergeMe::getSize(void) { return size; }
 
 /*============================================================================*/
 /*||                             JACOBSTAHL                                 ||*/
@@ -159,7 +125,7 @@ void PmergeMe::jacobstahlCreate(std::vector<size_t>& jacobstahlSequence, size_t 
 void PmergeMe::FJMIEntry(std::vector<int>& cont)
 {
 	std::vector< std::pair<std::vector<int>, size_t> > mainElements;
-
+	comparisons = 0;
 	if (DEBUG)
 	{
 		std::cout << BOLD << BBLUE
@@ -176,6 +142,7 @@ void PmergeMe::FJMIEntry(std::vector<int>& cont)
 void PmergeMe::FJMIEntry(std::deque<int>& cont)
 {
 	std::deque< std::pair<std::deque<int>, size_t> > mainElements;
+	comparisons = 0;
 	if (DEBUG)
 	{
 		std::cout << BOLD << BBLUE
